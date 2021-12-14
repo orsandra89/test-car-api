@@ -77,3 +77,16 @@ class PrivateCarbrandApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_basic_carbrand(self):
+        """Test creating carbrand"""
+        payload = {
+            'brandname': "BMW",
+            'country': 'Germany'
+        }
+        res = self.client.post(CARBRANDS_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        carbrand = Carbrand.objects.get(id=res.data['id'])
+        for key in payload.keys():
+            self.assertEqual(payload[key], getattr(carbrand, key))
