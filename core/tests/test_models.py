@@ -1,6 +1,12 @@
 from django.test import TestCase
 from django.contrib.auth import get_user, get_user_model
 
+from core import models
+
+
+def sample_user(email='test@gmail.com', password='test123'):
+    """Create a sample user"""
+    return get_user_model().objects.create_user(email, password)
 
 class ModelTests(TestCase):
 
@@ -39,3 +45,24 @@ class ModelTests(TestCase):
 
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
+
+    def test_carbrand_str(self):
+        """Test the carbrand string representation"""
+        carbrand = models.Carbrand.objects.create(
+            user = sample_user(),
+            brandname = "BMW",
+            country = "Germany"
+        )
+        
+        self.assertEqual(str(carbrand), carbrand.brandname)
+
+    def test_carmodel_str(self):
+        """Test the carmodel string representation"""
+        carmodel = models.Carmodel.objects.create(
+            user = sample_user(),
+            modelname = "E 200",
+            modelyear = "2008",
+            modelbodystyle = "sedan"
+        )
+
+        self.assertEqual(str(carmodel), carmodel.modelname)

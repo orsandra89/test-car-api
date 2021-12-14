@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.conf import settings
+from django.db.models.deletion import CASCADE
 
 
 class UserManager(BaseUserManager):
@@ -34,3 +36,30 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+
+class Carbrand(models.Model):
+    """Carbrand object"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    brandname = models.CharField(max_length=255)
+    country = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.brandname
+
+
+class Carmodel(models.Model):
+    """Carmodel object"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=CASCADE
+    )
+    modelname = models.CharField(max_length=255)
+    modelyear = models.IntegerField()
+    modelbodystyle = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.modelname
