@@ -7,6 +7,7 @@ from car import views
 
 router = DefaultRouter()
 router.register('carbrands', views.CarbrandViewSet)
+router.register('carmodels', views.CarmodelViewSet)
 
 app_name = 'car'
 

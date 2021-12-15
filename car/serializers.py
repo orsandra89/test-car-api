@@ -11,3 +11,12 @@ class CarbrandSerializer(serializers.ModelSerializer):
         model = Carbrand
         fields = ('id', 'brandname', 'country')
         read_only_fields = ('id',)
+
+
+class CarmodelSerializer(serializers.ModelSerializer):
+    """Serialize a carmodel"""
+
+    class Meta:
+        model = Carmodel
+        fields = ('id', 'modelname', 'modelyear', 'modelbodystyle')
+        read_only_fields = ('id',)
