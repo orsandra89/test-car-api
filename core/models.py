@@ -55,7 +55,7 @@ class Carmodel(models.Model):
     """Carmodel object"""
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=CASCADE
+        on_delete=models.CASCADE
     )
     modelname = models.CharField(max_length=255)
     modelyear = models.IntegerField()
@@ -63,3 +63,24 @@ class Carmodel(models.Model):
 
     def __str__(self):
         return self.modelname
+
+
+class Carobject(models.Model):
+    """Carobject object"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    carbrand = models.ManyToManyField('Carbrand')
+    carmodel = models.ManyToManyField('Carmodel')
+    price = models.CharField(max_length=255)
+    mileage = models.CharField(max_length=255)
+    exteriorcolor = models.CharField(max_length=255)
+    interiorcolor = models.CharField(max_length=255)
+    fuel = models.CharField(max_length=255)
+    transmission = models.CharField(max_length=255)
+    engineL = models.CharField(max_length=255)
+    sale = models.BooleanField()
+
+    def __str__(self):
+        return self.price

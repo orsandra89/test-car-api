@@ -66,3 +66,19 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(carmodel), carmodel.modelname)
+
+    def test_carobject_str(self):
+        """Test the carobject string representation"""
+        carobject = models.Carobject.objects.create(
+            user = sample_user(),
+            price = '10$',
+            mileage = '1000km',
+            exteriorcolor = 'white',
+            interiorcolor = 'white',
+            fuel = 'gas',
+            transmission = 'mechanic',
+            engineL = '2.0L',
+            sale = 'True'
+        )
+
+        self.assertEqual(str(carobject), carobject.price)

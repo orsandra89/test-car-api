@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from rest_framework import test
 from rest_framework.test import APIClient
 from rest_framework import status
 
@@ -11,7 +10,7 @@ from core.models import Carmodel
 from car.serializers import CarmodelSerializer
 
 
-CARMODEL_URL = reverse('car:carmodel-list')
+CARMODELS_URL = reverse('car:carmodel-list')
 
 
 def sample_carmodel(user, **params):
@@ -34,7 +33,7 @@ class PublicCarbrandApiTests(TestCase):
 
     def test_auth_required(self):
         """Test that authenticated is required"""
-        res = self.client.get(CARMODEL_URL)
+        res = self.client.get(CARMODELS_URL)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -55,7 +54,7 @@ class PrivateCarbrandApiTests(TestCase):
         sample_carmodel(user=self.user)
         sample_carmodel(user=self.user)
 
-        res = self.client.get(CARMODEL_URL)
+        res = self.client.get(CARMODELS_URL)
 
         carbrands = Carmodel.objects.all().order_by('id')
         serializer = CarmodelSerializer(carbrands, many=True)
@@ -71,7 +70,7 @@ class PrivateCarbrandApiTests(TestCase):
         sample_carmodel(user=user2)
         sample_carmodel(user=self.user)
 
-        res = self.client.get(CARMODEL_URL)
+        res = self.client.get(CARMODELS_URL)
 
         carbrands = Carmodel.objects.filter(user=self.user)
         serializer = CarmodelSerializer(carbrands, many=True)
@@ -86,7 +85,7 @@ class PrivateCarbrandApiTests(TestCase):
             'modelyear': 2006,
             'modelbodystyle': 'sedan'
         }
-        res = self.client.post(CARMODEL_URL, payload)
+        res = self.client.post(CARMODELS_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         carbrand = Carmodel.objects.get(id=res.data['id'])
