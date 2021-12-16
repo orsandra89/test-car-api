@@ -2,11 +2,20 @@ from django.test import TestCase
 from django.contrib.auth import get_user, get_user_model
 
 from core import models
+from core.models import Carbrand, Carmodel
 
 
-def sample_user(email='test@gmail.com', password='test123'):
+def sample_carbrand(user, brandname='BMW', country='Germany'):
+    """Create and return sample carbrand"""
+    return Carbrand.objects.create(user=user, brandname=brandname, country=country)
+
+def sample_carmodel(user, modelname='X5', modelyear='2020', modelbodystyle='sedan'):
+    """Create and return sample carmodel"""
+    return Carmodel.objects.create(user=user, modelname=modelname, modelyear=modelyear, modelbodystyle=modelbodystyle)
+
+def sample_user(email='test123123123@gmail.com', password='test123'):
     """Create a sample user"""
-    return get_user_model().objects.create_user(email, password)
+    return get_user_model().objects.create_user(email=email, password=password)
 
 class ModelTests(TestCase):
 
@@ -69,8 +78,13 @@ class ModelTests(TestCase):
 
     def test_carobject_str(self):
         """Test the carobject string representation"""
+        user = sample_user()
+        carbrand = sample_carbrand(user = user)
+        carmodel = sample_carmodel(user = user)
         carobject = models.Carobject.objects.create(
-            user = sample_user(),
+            carbrand = carbrand,
+            carmodel = carmodel,
+            user = user,
             price = 10.0,
             mileage = 1000.0,
             exteriorcolor = 'white',
@@ -80,5 +94,4 @@ class ModelTests(TestCase):
             engineL = '2.0L',
             sale = 'True'
         )
-
-        self.assertEqual(str(carobject), carobject.user)
+        self.assertEqual(str(carobject), f'{carbrand} {carmodel}')

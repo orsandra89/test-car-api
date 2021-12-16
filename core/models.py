@@ -71,8 +71,8 @@ class Carobject(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
-    carbrand = models.ForeignKey(Carbrand, on_delete=models.CASCADE,default=1)
-    carmodel = models.ForeignKey(Carmodel, on_delete=models.CASCADE,default=1)
+    carbrand = models.ForeignKey(Carbrand, on_delete=models.CASCADE)
+    carmodel = models.ForeignKey(Carmodel, on_delete=models.CASCADE)
     price = models.FloatField(default=0, null=False)
     mileage = models.FloatField(default=0, null=False)
     exteriorcolor = models.CharField(max_length=255)
