@@ -31,8 +31,8 @@ def sample_carmodel(user, name='A3'):
 def sample_carobject(user, **params):
     """Create and return a sample car"""
     defaults = {
-        'price': '10$',
-        'mileage': '1000km',
+        'price': 10.0,
+        'mileage': 1000.0,
         'exteriorcolor': 'white',
         'interiorcolor': 'white',
         'fuel': 'gas',
@@ -76,7 +76,7 @@ class PrivateCarobjectApiTests(TestCase):
 
         res = self.client.get(CAROBJECTS_URL)
 
-        carobjects = Carobject.objects.all().order_by('id')
+        carobjects = Carobject.objects.all().order_by('-id')
         serializer = CarobjectSerializer(carobjects, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
@@ -99,7 +99,7 @@ class PrivateCarobjectApiTests(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     def test_view_carobject_detail(self):
-        """Test viewing a recipe detail"""
+        """Test viewing a carobject detail"""
         carobject = sample_carobject(user=self.user)
         carobject.carbrand.add(sample_carbrand(user=self.user))
         carobject.carmodel.add(sample_carmodel(user=self.user))
@@ -109,3 +109,47 @@ class PrivateCarobjectApiTests(TestCase):
 
         serializer = CarobjectDetailSerializer(carobject)
         self.assertEqual(res.data, serializer.data)
+
+    def test_filter_carobjects_by_carbrand(self):
+        """"""
+        carobject1 = sample_carobject(user=self.user, fuel='gas')
+        carobject2 = sample_carobject(user=self.user, fuel='diesel')
+        carbrand1 = sample_carbrand(user=self.user, brandname='BMW')
+        carbrand2 = sample_carbrand(user=self.user, brandname='Mercedess')
+        carobject1.carbrand.add(carbrand1)
+        carobject2.carbrand.add(carbrand2)
+        carobject3 = sample_carobject(user=self.user, fuel='benzin')
+
+        res = self.client.get(
+            CAROBJECTS_URL,
+            {'carbrand': f'{carbrand1.id},{carbrand2.id}'}
+        )
+
+        serializer1 = CarobjectSerializer(carobject1)
+        serializer2 = CarobjectSerializer(carobject2)
+        serializer3 = CarobjectSerializer(carobject3)
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
+
+    def test_filter_recipes_by_carmodels(self):
+        """"""
+        carobject1 = sample_carobject(user=self.user, fuel='gas')
+        carobject2 = sample_carobject(user=self.user, fuel='diesel')
+        carmodel1 = sample_carmodel(user=self.user, modelname='E200')
+        carmodel2 = sample_carmodel(user=self.user, modelname='E220')
+        carobject1.carmodel.add(carmodel1)
+        carobject2.carmodel.add(carmodel2)
+        carobject3 = sample_carobject(user=self.user, title='benzin')
+
+        res = self.client.get(
+            CAROBJECTS_URL,
+            {'carmodel': f'{carmodel1.id},{carmodel2.id}'}
+        )
+
+        serializer1 = CarobjectSerializer(carobject1)
+        serializer2 = CarobjectSerializer(carobject2)
+        serializer3 = CarobjectSerializer(carobject3)
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)

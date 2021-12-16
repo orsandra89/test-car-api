@@ -49,6 +49,7 @@ class PrivateCarbrandApiTests(TestCase):
         )
         self.client.force_authenticate(self.user)
 
+
     def test_retreive_carbrand(self):
         """Test retrieving a list of carbrand"""
         sample_carbrand(user=self.user)
