@@ -24,14 +24,6 @@ class CarmodelSerializer(serializers.ModelSerializer):
 
 class CarobjectSerializer(serializers.ModelSerializer):
     """Serialize a carobject"""
-    carbrand = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset = Carbrand.objects.all()
-    )
-    carmodel = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset = Carmodel.objects.all()
-    )
 
     class Meta:
         model = Carobject

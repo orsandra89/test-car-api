@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from rest_framework import serializers, status
+from rest_framework import  status
 from rest_framework.test import APIClient
 
 from core.models import Carobject, Carbrand, Carmodel
@@ -10,27 +10,26 @@ from core.models import Carobject, Carbrand, Carmodel
 from car.serializers import CarobjectSerializer, CarobjectDetailSerializer
 
 
-CAROBJECTS_URL = reverse('car:car-list')
+CAROBJECTS_URL = reverse('car:carobject-list')
 
 
 def detail_url(carobject_id):
     """Return carobject detail URL"""
-    return reverse('car:car-detail', args=[carobject_id])
+    return reverse('car:carobject-detail', args=[carobject_id])
 
-
-def sample_carbrand(user, name='Main'):
+def sample_carbrand(user, brandname='BMW', country='Germany'):
     """Create and return sample carbrand"""
-    return Carbrand.objects.create(user=user, name=name)
+    return Carbrand.objects.create(user=user, brandname=brandname, country=country)
 
-
-def sample_carmodel(user, name='A3'):
+def sample_carmodel(user, modelname='X5', modelyear='2020', modelbodystyle='sedan'):
     """Create and return sample carmodel"""
-    return Carmodel.objects.create(user=user, name=name)
-
+    return Carmodel.objects.create(user=user, modelname=modelname, modelyear=modelyear, modelbodystyle=modelbodystyle)
 
 def sample_carobject(user, **params):
     """Create and return a sample car"""
     defaults = {
+        'carbrand': sample_carbrand(user=user),
+        'carmodel': sample_carmodel(user=user),
         'price': 10.0,
         'mileage': 1000.0,
         'exteriorcolor': 'white',
@@ -76,7 +75,7 @@ class PrivateCarobjectApiTests(TestCase):
 
         res = self.client.get(CAROBJECTS_URL)
 
-        carobjects = Carobject.objects.all().order_by('-id')
+        carobjects = Carobject.objects.all().order_by('id')
         serializer = CarobjectSerializer(carobjects, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
@@ -101,8 +100,8 @@ class PrivateCarobjectApiTests(TestCase):
     def test_view_carobject_detail(self):
         """Test viewing a carobject detail"""
         carobject = sample_carobject(user=self.user)
-        carobject.carbrand.add(sample_carbrand(user=self.user))
-        carobject.carmodel.add(sample_carmodel(user=self.user))
+        carobject.carbrands.add(sample_carbrand(user=self.user))
+        carobject.carmodels.add(sample_carmodel(user=self.user))
 
         url = detail_url(carobject.id)
         res = self.client.get(url)
@@ -111,13 +110,13 @@ class PrivateCarobjectApiTests(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     def test_filter_carobjects_by_carbrand(self):
-        """"""
+        """Test returing carobjects with specific carbrand"""
         carobject1 = sample_carobject(user=self.user, fuel='gas')
         carobject2 = sample_carobject(user=self.user, fuel='diesel')
         carbrand1 = sample_carbrand(user=self.user, brandname='BMW')
         carbrand2 = sample_carbrand(user=self.user, brandname='Mercedess')
-        carobject1.carbrand.add(carbrand1)
-        carobject2.carbrand.add(carbrand2)
+        carobject1.carbrands.add(carbrand1)
+        carobject2.carbrands.add(carbrand2)
         carobject3 = sample_carobject(user=self.user, fuel='benzin')
 
         res = self.client.get(

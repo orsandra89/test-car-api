@@ -48,31 +48,33 @@ class CarobjectViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    # def _params_to_ints(self, qs):
-    #     """Convert a list of string IDs to a list of integers"""
-    #     return [int(str_id) for str_id in qs.split(',')]
+    def _params_to_ints(self, qs):
+        """Convert a list of string IDs to a list of integers"""
+        return [int(str_id) for str_id in qs.split(',')]
 
     def get_queryset(self):
-        # """Retrieve the carobjects for the authenticated user"""
-        # carbrands = self.request.query_params.get('carbrands')
-        # carmodels = self.request.query_params.get('carmodels')
-        # queryset = self.queryset
-        # if carbrands:
-        #     carbrand_ids = self._params_to_ints(carbrands)
-        #     queryset = queryset.filter(carbrands__id__in=carbrand_ids)
-        # if carmodels:
-        #     carmodel_ids = self._params_to_ints(carmodels)
-        #     queryset = queryset.filter(carmodels__id__in=carmodel_ids)
+        """Retrieve the carobjects for the authenticated user"""
+        carbrands = self.request.query_params.get('carbrands')
+        carmodels = self.request.query_params.get('carmodels')
+        queryset = self.queryset
+        if carbrands:
+            carbrand_ids = self._params_to_ints(carbrands)
+            queryset = queryset.filter(carbrands__id__in=carbrand_ids)
+        if carmodels:
+            carmodel_ids = self._params_to_ints(carmodels)
+            queryset = queryset.filter(carmodels__id__in=carmodel_ids)
 
-        return Carobject.objects.filter(user=self.request.user)
+        return self.queryset.filter(user=self.request.user)
 
-    # def get_serializer_class(self):
-    #     """Return appropriate serializer class"""
-    #     if self.action == 'retrieve':
-    #         return serializers.CarobjectDetailSerializer
+    def get_serializer_class(self):
+        """Return appropriate serializer class"""
+        if self.action == 'retrieve':
+            return serializers.CarobjectDetailSerializer
 
-    #     return self.serializer_class
+        return self.serializer_class
 
     def perform_create(self, serializer):
         """Create a new carobject"""
-        serializer.save(user=self.request.user)
+        brand = Carbrand.objects.get(id=self.request.POST.get('carbrand'))
+        model = Carmodel.objects.get(id=self.request.POST.get('carmodel'))
+        serializer.save(user=self.request.user, carbrand=brand, carmodel=model)
